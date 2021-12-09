@@ -1,31 +1,32 @@
 <html>
-<head>
-<script type="text/javascript">
-function flip(){
-let hex = document.getElementById("hex").value;
-let a = hex.match(/.{8}/g); // Match First 8 characters
-let c = "";
-for(let b of a){
-// Cycle Through array of characters
-// match 2 characters, reverse then join.
-c += b.match(/../g).reverse().join("");
-};
-document.getElementById("flipped").value = c;
-};
-</script>
-</head>
-<body>
-<textarea id="hex" style="width: 1246px; height: 215px;" placeholder="
-    How to use:
-    Swaps Big Endian to Little Endian, or vice versa.
-    Place hexadecimal you want into this textarea.
-    Press Swap Endianness.
-"></textarea>
-<br />
-<br />
-<input value="swap endianness" type="button" onclick="flip();" style="width: 75%;" />
-<br />
-<br />
-<textarea id="flipped" style="width: 1246px; height: 215px;"></textarea>
-</body>
+    <head>
+        <title>Hex Flipper - Metroynome</title>
+        <script type="text/javascript">
+            function flip(){
+                let hex = document.getElementById("hex").value;
+                let a = hex.match(/.{8}/g); // Match First 8 characters
+                let c = "";
+                for(let b of a){
+                    // Cycle Through array of characters
+                    // match 2 characters, reverse then join.
+                    c += b.match(/../g).reverse().join("");
+                };
+                document.getElementById("flipped").value = c;
+            };
+        </script>
+    </head>
+    <body>
+        <textarea id="hex" style="width: 1246px; height: 215px;" placeholder="
+            How to use:
+            Swaps Big Endian to Little Endian, or vice versa.
+            Place hexadecimal you want into this textarea.
+            Press Swap Endianness.
+        "></textarea>
+        <br />
+        <br />
+        <input value="swap endianness" type="button" onclick="flip();" style="width: 75%;" />
+        <br />
+        <br />
+        <textarea id="flipped" style="width: 1246px; height: 215px;"></textarea>
+    </body>
 </html>
