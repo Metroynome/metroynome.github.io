@@ -1,0 +1,92 @@
+<html>
+    <head>
+        <title>Save Editor</title>
+    </head>
+    <body>
+        <form name="uploadForm">
+            <div>
+            <input id="InputFile" type="file" />
+        </div>
+        <!--<div><input type="submit" value="Save" /></div>-->
+        </form>
+        <div>
+            <label for="Name">Name: </label>
+            <output id="Name">----</output>
+        </div>
+        <div>
+            <label for="Size">Total size:</label>
+            <output id="Size">----</output>
+        </div>
+        <div width="100%">
+            <textarea id="Bytes" style="margin: 0px; width: 100%; max-width: 100%; height: 215px;"></textarea>
+        </div>
+
+        <script type="text/javascript">
+            function HandleFile(e) {
+                const selected = InputFile.files[0];
+                if (selected) {
+                    addListeners(reader);
+                    FileInfo(e);
+                    FileBytes.value = reader.readAsArrayBuffer(selected);
+                }
+            }
+            function addListeners(reader) {
+                reader.addEventListener("loadstart", handleEvent);
+                reader.addEventListener("load", handleEvent);
+                reader.addEventListener("loadend", handleEvent);
+                reader.addEventListener("progress", handleEvent);
+                reader.addEventListener("error", handleEvent);
+                reader.addEventListener("abort", handleEvent);
+            }
+            function handleEvent(event){
+                function pad(num, size){
+                    // num = num.toString();
+                    while (num.length < size) num = "0" + num;
+                    return num;
+                }
+                console.log(`${event.type}: ${event.loaded} bytes transferred`);
+                if(event.type === "loadstart"){
+                    FileBytes.value = "Reading File...Please Wait";
+                }
+                if(event.type === "loadend"){
+                    let data = new Int32Array(reader.result);
+                    let array = new Array();
+                    let FullData = "";
+                    for(var i in data){
+                        let a = i * 4;
+                        let Offset = pad(a.toString(16), 4).toUpperCase();
+                        let Value = pad(data[i].toString(16), 8).toUpperCase();
+                        FullData += `${Offset}h: ${Value}\n`;
+                        // array.push([Offset, Value]);
+                    }
+
+                    FileBytes.value = FullData;
+                }
+            }
+            function FileInfo(e){
+                const TheFile = e.target.files[0];
+                FileName.innerText = TheFile.name;
+
+                // Calculate total size
+                let numberOfBytes = TheFile.size;
+                // Approximate to the closest prefixed unit
+                const units = ["B", "KiB", "MiB"];
+                const exponent = Math.min(
+                    Math.floor(Math.log(numberOfBytes) / Math.log(1024)),
+                    units.length - 1
+                );
+                const approx = numberOfBytes / 1024 ** exponent;
+                const output = exponent === 0 ? `${numberOfBytes} bytes` : `${approx.toFixed(2)} ${units[exponent]} (${numberOfBytes} bytes)`;
+                FileSize.textContent = output;
+            };
+
+            const InputFile = document.getElementById("InputFile");
+            const FileName = document.getElementById("Name");
+            const FileSize = document.getElementById("Size");
+            const FileBytes = document.getElementById("Bytes");
+            const reader = new FileReader();
+
+            InputFile.addEventListener("change", HandleFile);
+        </script>
+    </body>
+</html>
