@@ -99,9 +99,9 @@
             var create = document.getElementById("Save");
             var textbox = document.getElementById("Bytes");
 
-            create.addEventListener('click', function () {
+            create.addEventListener('click', function(){
                 var link = document.createElement("a");
-                link.setAttribute("download", "patch.bin");
+                link.setAttribute("download", FileName.textContent);
                 link.href = makeTextFile(ArrayOfBytes);
                 document.body.appendChild(link);
 
