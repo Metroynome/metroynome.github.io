@@ -1,6 +1,7 @@
 <html>
     <head>
         <title>Save Editor</title>
+        <meta name="color-scheme" content="light dark">
     </head>
     <body>
         <form name="uploadForm">
@@ -22,6 +23,193 @@
         <div><input id="Save" type="submit" value="Save it!" /></div>
 
         <script type="text/javascript">
+            const ModBasicType = {
+                MOD_BSC_UNDEFINED: 0,
+                MOD_BSC_SPEED: 1,
+                MOD_BSC_AMMO: 2,
+                MOD_BSC_AIMING: 3,
+                MOD_BSC_IMPACT: 4,
+                MOD_BSC_AREA: 5,
+                MOD_BSC_XP: 6,
+                MOD_BSC_JACKPOT: 7,
+                MOD_BSC_NANOLEECH: 8
+            };
+            const ModPostFXType = {
+                MOD_PFX_UNDEFINED: 0,
+                MOD_PFX_NAPALM: 1,
+                MOD_PFX_ELECTRICDOOM: 2,
+                MOD_PFX_FREEZING: 3,
+                MOD_PFX_BOMBLETS: 4,
+                MOD_PFX_MORPHING: 5,
+                MOD_PFX_INFECTION: 6,
+                MOD_PFX_PLAGUE: 7,
+                MOD_PFX_SHOCK: 8
+            };
+            const ModWeaponType = {
+                MOD_WPN_UNDEFINED: 0,
+                MOD_WPN_ROCKET_GUIDANCE: 1,
+                MOD_WPN_SHOTGUN_WIDTH: 2,
+                MOD_WPN_SHOTGUN_LENGTH: 3,
+                MOD_WPN_GRENADE_MANUALDET: 4,
+                MOD_WPN_MACHGUN_BEAM: 5,
+                MOD_WPN_SNIPER_PIERCING: 6
+            };
+            class Clock{
+                constructor(){
+                    this.structStart;
+                    this.structSize = 0x8;
+                    this.stat;
+                    this.second;
+                    this.minute;
+                    this.hour;
+                    this.pad;
+                    this.day;
+                    this.month;
+                    this.year;
+                };
+            };
+            class HelpDatum{
+                constructor(){
+                    this.structStart;
+                    this.structSize = 0xc;
+                    this.timeUsed; // short unsigned int
+                    this.counter; // short unsigned int
+                    this.lastTime; // unsigned int
+                    this.level_die; // unsigned int
+                };
+            };
+            class GameSettings{
+                constructor(){
+                    this.structStart;
+                    this.structSize = 0xc4;
+                    this.PalMode = 0;
+                    this.HelpVoiceOn = 0;
+                    this.HelpTextOn = 0;
+                    this.SubtitlesActive = 0;
+                    this.Stereo = 0;
+                    this.MusicVolume = 0;
+                    this.EffectsVolume = 0;
+                    this.VoVolume = 0;
+                    this.CameraElevationDir = new Array(3).fill(0).map(() => new Array(4).fill(0));
+                    this.CameraAzimuthDir = new Array(3).fill(0).map(() => new Array(4).fill(0));
+                    this.CameraRotateSpeed = new Array(3).fill(0).map(() => new Array(4).fill(0));
+                    this.FirstPersonModeOn = new Array(10).fill(0);
+                    this._was_NTSCProgessive = 0;
+                    this.Wide = 0;
+                    this.ControllerVibrationOn = new Array(8).fill(0);
+                    this.QuickSelectPauseOn = 0;
+                    this.Language = 0;
+                    this.AuxSetting2 = 0;
+                    this.AuxSetting3 = 0;
+                    this.AuxSetting4 = 0;
+                    this.AutoSaveOn = 0;
+                    this.padding1 = 0;
+                    this.padding2 = 0;
+                };
+            };
+            class HeroSave{
+                constructor(){
+                    this.structStart = 0x24;
+                    this.structSize = 0x3c;
+                    this.bolts = 0;
+                    this.boltDeficit = 0;
+                    this.xp = 0;
+                    this.points = 0;
+                    this.HeroMaxHp = 0;
+                    this.ArmorLevel = 0;
+                    this.limitBreak = 0.0;
+                    this.purchasedSkins = 0;
+                    this.spentDiffStars = 0;
+                    this.boltMultLevel = 0;
+                    this.boltMultSubLevel = 0;
+                    this.OldGameSaveData = 0;
+                    this.blueBadges = 0;
+                    this.redBadges = 0;
+                    this.greenBadges = 0;
+                    this.goldBadges = 0;
+                    this.blackBadges = 0;
+                    this.Completes = 0;
+                    this.lastEquippedGadget = [0, 0];
+                    this.tempWeapons = [0, 0, 0, 0];
+                    this.currentMaxLimitBreak = 0;
+                    this.ArmorLevel2 = 0;
+                    this.progressionArmorLevel = 0;
+                    this.startLimitBreakDiff = 0;
+                };
+            };
+            class GameBootOptions{
+                constructor(){
+                    this.structStart;
+                    this.structSize = 0x8;
+                    this.wideScreen = false;
+                    this.progressiveScan = false;
+                    this.stereo = false;
+                    this.musicVolume = 0;
+                    this.effectsVolume = 0;
+                    this.language = 0;
+                    this.screen_offset_x = 0;
+                    this.screen_offset_y = 0;
+                };
+            };
+            class GadgetEntry{
+                constructor(){
+                    this.structStart;
+                    this.structSize = 0x44;
+                    this.level = 0;
+                    this.sAmmo = 0;
+                    this.sXP = 0;
+                    this.iActionFrame = 0;
+                    this.modActivePostFX;
+                    this.modActiveWeapon;
+                    this.modActiveBasic = new Array(10);
+                    this.modWeapon = new Array(2);
+                };
+            };
+            class BotSave{
+                constructor(){
+                    this.structStart;
+                    this.structSize = 0x28;
+                    this.botUpgrades = new Array(17).fill(0);
+                    this.botPaintjobs = new Array(11).fill(0);
+                    this.botHeads = new Array(8).fill(0);
+                    this.curBotPaintJob = [0, 0];
+                    this.curBotHead = [0, 0];
+                };
+            };
+            class SaveGame{
+                constructor(){
+                    this.loaded = false;
+                    this.level = null;
+                    this.elapsed_time = null;
+                    this.last_save_time = null;
+                    this.global_flags = null;
+                    this.cheats_activated = null;
+                    this.skill_points = null;
+                    this.help_data_messages = null;
+                    this.help_data_misc = null;
+                    this.help_data_gadgets = null;
+                    this.cheats_ever_activated = null;
+                    this.settings = null;
+                    this.hero_save = null;
+                    this.movies_played_record = null;
+                    this.total_play_time = null;
+                    this.total_deaths = null;
+                    this.help_log = null;
+                    this.help_log_pos = null;
+                    this.hero_gadget_box = null;
+                    this.purchaseable_gadgets = null;
+                    this.bot_save = null;
+                    this.first_person_desired_mode = null;
+                    this.saved_difficulty_level = null;
+                    this.player_statistics = new Array(2); //.fill(new PlayerData());
+                    this.battledome_wins_and_losses = null;
+                    this.enemy_kills = new Array(30); //.fill(new EnemyKillInfo());
+                    this.quick_switch_gadgets = null;
+                };
+            };
+/*=====================================================================*\
+            Start Functions!
+\*=====================================================================*/
             function HandleFile(e){
                 const selected = InputFile.files[0];
                 if (selected) {
@@ -49,8 +237,9 @@
                     FileBytes.value = "Reading File...Please Wait";
                 }
                 if(event.type === "loadend"){
-                    let data = new Uint32Array(reader.result);
-                    let data2 = new Uint8Array(reader.result);
+                    let data = new Uint32Array(reader.result); // Create Array of Uint 32bit.
+                    let data2 = new Uint8Array(reader.result); // Create Array ofr Uint 8bit.
+                    // ArrayOfBytes is what is currently saved into patch.bin.
                     ArrayOfBytes = data2;
                     let array = new Array();
                     let FullData = "";
@@ -80,16 +269,15 @@
                 FileSize.textContent = output;
             };
 
-            var textFile = null,
-            makeTextFile = function(text){
-                var data = new Blob([text], {type: "text/binary"});
+            var textFile = null;
+            var makeTextFile = function(text){
+                var data = new Blob([text], {type: "binary"});
 
                 // If we are replacing a previously generated file we need to
                 // manually revoke the object URL to avoid memory leaks.
-                if (textFile !== null) {
+                if(textFile !== null){
                     window.URL.revokeObjectURL(textFile);
-                }
-
+                };
                 textFile = window.URL.createObjectURL(data);
 
                 // returns a URL you can use as a href
@@ -111,7 +299,6 @@
                     link.dispatchEvent(event);
                     document.body.removeChild(link);
                 });
-
             }, false);
 
             const InputFile = document.getElementById("InputFile");
